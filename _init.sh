@@ -119,26 +119,6 @@ cd $EXT_DIR
 git clone https://github.com/Osthanes/utilities.git utilities
 popd >/dev/null
 
-###################################
-# Configure Globalization Service #
-###################################
-echo "Setting up space"
-pushd . 
-cd ${EXT_DIR}
-python globalization_check.py 
-RESULT=$?
-
-if [ $RESULT -ne 0 ]; then
-    echo -e "${red}Failed to setup/check service in space${no_color}"
-    exit $RESULT
-else 
-    echo -e "${green}Successfully setup/checked service within Bluemix space${no_color}"
-fi 
-debugme cat setenv_globalization
-. setenv_globalization.sh
-rm setenv_globalization.sh  
-popd 
-
 #############################################
 # Capture packages installed on the container  
 #############################################
