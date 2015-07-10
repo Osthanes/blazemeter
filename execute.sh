@@ -46,21 +46,4 @@ debugme echo "TEST_ID: ${TEST_ID}"
 
 #debugme echo "curl -X get https://a.blazemeter.com:443/api/latest/tests/${TEST_ID}/start -H "Content-Type: application/json" -H "x-api-key: ${BLAZEMETER_APIKEY}"
 echo "Starting test"
-#curl -X get https://a.blazemeter.com:443/api/latest/tests/${TEST_ID}/start -H "Content-Type: application/json" -H "x-api-key: ${BLAZEMETER_APIKEY}"
-
-SESSION_ID=$(curl --silent --insecure https://a.blazemeter.com:443/api/latest/tests/${TEST_ID}/start?api_key=${BLAZEMETER_APIKEY} | jq '.result.sessionsId[]' | tr -d \")
-
-## Query Test Status
-echo "Query test status"
-TEST_RUN_STATUS=$(curl --silent --insecure ${BZA}/api/latest/sessions/${SESSION_ID}?api_key=${BZA_API_KEY} | jq '.result.status' | tr -d \" )
-echo ${TEST_RUN_STATUS}
-
-sleep 120
-
-echo "Query test status"
-TEST_RUN_STATUS=$(curl --silent --insecure ${BZA}/api/latest/sessions/${SESSION_ID}?api_key=${BZA_API_KEY} | jq '.result.status' | tr -d \" )
-echo ${TEST_RUN_STATUS}
-
-
-
-
+curl -X get https://a.blazemeter.com:443/api/latest/tests/${TEST_ID}/start -H "Content-Type: application/json" -H "x-api-key: ${BLAZEMETER_APIKEY}"
