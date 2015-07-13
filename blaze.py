@@ -87,9 +87,6 @@ def test_monitor(session_id):
 logging.captureWarnings(True)
 LOGGER = setup_logging()
 
-print API_KEY
-print TEST_ID
-
 if not API_KEY:
     print LABEL_RED + STARS
     print "Error.  No Blazemeter API key specified."
