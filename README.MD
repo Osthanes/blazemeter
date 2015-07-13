@@ -1,7 +1,7 @@
 # Blazemeter
-(Experimental) This extension allows for integrating Blazemeter as a service into Bluemix Devops Services's Delivery Pipeline.
+**(Experimental)** This extension allows for integrating Blazemeter as a service into Bluemix Devops Services's Delivery Pipeline.
 
-# documentation 
+# Documentation
 
-References 
+# References
 * [Blazemeter](https://blazemeter.com)
