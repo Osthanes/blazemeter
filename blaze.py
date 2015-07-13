@@ -79,6 +79,9 @@ def test_monitor(session_id):
 logging.captureWarnings(True)
 LOGGER = setup_logging()
 LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
+
+print "Can you see this?"
+
 res = test_start(TEST_ID)
 
 if res.status_code == 200:
