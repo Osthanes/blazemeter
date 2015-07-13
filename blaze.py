@@ -8,8 +8,6 @@ import logging
 import os
 
 BLZ_URL = "https://a.blazemeter.com"
-API_KEY = "e30010e6a8f498ffc4fd"
-TEST_ID = "5085122"
 POLL_TIME = 30
 EXEC_REPORT = BLZ_URL + "/app/printable-report/index.html?base_url=&session_id=%s"
 DEBUG = os.environ.get('DEBUG')
@@ -20,6 +18,9 @@ LABEL_RED = '\033[0;31m'
 LABEL_COLOR = '\033[0;33m'
 LABEL_NO_COLOR = '\033[0m'
 STARS = "**********************************************************************"
+
+API_KEY = os.getenv('BLAZEMETER_APIKEY')
+TEST_ID = os.getenv('TEST_ID')
 
 
 def request(url):
@@ -85,6 +86,22 @@ def test_monitor(session_id):
 # Needed to get rid of InsecureRequestWarning
 logging.captureWarnings(True)
 LOGGER = setup_logging()
+
+print API_KEY
+print TEST_ID
+
+if not API_KEY:
+    print LABEL_RED + STARS
+    print "Error.  No Blazemeter API key specified."
+    print STARS + LABEL_NO_COLOR
+    sys.exit(1)
+
+if not TEST_ID:
+    print LABEL_RED + STARS
+    print "Error. No test id specified."
+    print STARS + LABEL_NO_COLOR
+    sys.exit(1)
+
 
 LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
 
