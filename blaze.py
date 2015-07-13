@@ -1,7 +1,12 @@
+#!/usr/bin/python
+
 import requests
 import sys
 import json
 import time
+import logging
+
+logging.captureWarnings(True)
 
 BLZ_URL = "https://a.blazemeter.com"
 API_KEY = "e30010e6a8f498ffc4fd"
