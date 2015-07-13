@@ -14,6 +14,13 @@ POLL_TIME = 30
 EXEC_REPORT = BLZ_URL + "/app/printable-report/index.html?base_url=&session_id=%s"
 DEBUG = os.environ.get('DEBUG')
 
+# ascii color codes for output
+LABEL_GREEN = '\033[0;32m'
+LABEL_RED = '\033[0;31m'
+LABEL_COLOR = '\033[0;33m'
+LABEL_NO_COLOR = '\033[0m'
+STARS = "**********************************************************************"
+
 
 def request(url):
     headers = {'x-api-key': API_KEY}
@@ -78,9 +85,8 @@ def test_monitor(session_id):
 # Needed to get rid of InsecureRequestWarning
 logging.captureWarnings(True)
 LOGGER = setup_logging()
-LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
 
-print "Can you see this?"
+LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
 
 res = test_start(TEST_ID)
 
@@ -104,6 +110,9 @@ if res.status_code == 200:
             time.sleep(POLL_TIME)
 
     dataUrl = res_json["result"].get("dataUrl")
-    LOGGER.info("Test completed.")
-    LOGGER.info("See executive summary at: " + EXEC_REPORT % sessionId)
-    LOGGER.info("See logs and detailed reports at: " + dataUrl)
+
+    print LABEL_GREEN + STARS
+    print "Test completed successfully."
+    print "See executive summary at: " + EXEC_REPORT % sessionId
+    print "See logs and detailed reports at: " + dataUrl
+    print LABEL_GREEN + STARS + LABEL_NO_COLOR
