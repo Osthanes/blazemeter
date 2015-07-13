@@ -5,7 +5,9 @@ import sys
 import json
 import time
 import logging
+import os
 
+# Needed to get rid of InsecureRequestWarning
 logging.captureWarnings(True)
 
 BLZ_URL = "https://a.blazemeter.com"
@@ -14,6 +16,7 @@ TEST_ID = "5085122"
 POLL_TIME = 30
 EXEC_REPORT = BLZ_URL + "/app/printable-report/index.html?base_url=&session_id=%s"
 
+DEBUG = os.environ.get('DEBUG')
 
 def request(url):
     headers = {'x-api-key': API_KEY}
@@ -22,6 +25,33 @@ def request(url):
 
 def print_json(obj):
     print json.dumps(obj, indent=4, sort_keys=True)
+
+
+def setup_logging():
+    logger = logging.getLogger('pipeline')
+    if DEBUG:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
+    # if logmet is enabled, send the log through syslog as well
+    if os.environ.get('LOGMET_LOGGING_ENABLED'):
+        handler = logging.handlers.SysLogHandler(address='/dev/log')
+        logger.addHandler(handler)
+        # don't send debug info through syslog
+        handler.setLevel(logging.INFO)
+
+    # in any case, dump logging to the screen
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    if DEBUG:
+        handler.setLevel(logging.DEBUG)
+    else:
+        handler.setLevel(logging.INFO)
+    logger.addHandler(handler)
+
+    return logger
 
 
 def test_start(test_id):
@@ -46,8 +76,10 @@ def test_monitor(session_id):
         print e
         sys.exit(1)
 
-
 # Start
+LOGGER = setup_logging()
+LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
+
 print "Starting test.  [Test Id: %s]" % TEST_ID
 res = test_start(TEST_ID)
 
@@ -74,4 +106,3 @@ if res.status_code == 200:
     print "\nTest completed."
     print "See executive summary at: " + EXEC_REPORT % sessionId
     print "See logs and detailed reports at: " + dataUrl
-
