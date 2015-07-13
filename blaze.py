@@ -7,16 +7,13 @@ import time
 import logging
 import os
 
-# Needed to get rid of InsecureRequestWarning
-logging.captureWarnings(True)
-
 BLZ_URL = "https://a.blazemeter.com"
 API_KEY = "e30010e6a8f498ffc4fd"
 TEST_ID = "5085122"
 POLL_TIME = 30
 EXEC_REPORT = BLZ_URL + "/app/printable-report/index.html?base_url=&session_id=%s"
-
 DEBUG = os.environ.get('DEBUG')
+
 
 def request(url):
     headers = {'x-api-key': API_KEY}
@@ -76,17 +73,18 @@ def test_monitor(session_id):
         print e
         sys.exit(1)
 
+
 # Start
+# Needed to get rid of InsecureRequestWarning
+logging.captureWarnings(True)
 LOGGER = setup_logging()
 LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
-
-print "Starting test.  [Test Id: %s]" % TEST_ID
 res = test_start(TEST_ID)
 
 if res.status_code == 200:
     sessionId = res.json()["result"].get("sessionsId")[0]
     if sessionId:
-        print "Test started successfully.  [Session Id: %s]\n" % sessionId
+        LOGGER.info("Test started successfully.  [Session Id: %s]" % sessionId)
 
         status = None
         while True:
@@ -96,13 +94,13 @@ if res.status_code == 200:
             newStatus = res_json["result"].get("status")
             if newStatus != status:
                 status = newStatus
-                statusCode = res_json["result"].get("statusCode")
-                print "Status: %s, Status-Code: %s" % (status, statusCode)
+                # statusCode = res_json["result"].get("statusCode")
+                LOGGER.info(status)
             if status == "ENDED":
                 break
             time.sleep(POLL_TIME)
 
     dataUrl = res_json["result"].get("dataUrl")
-    print "\nTest completed."
-    print "See executive summary at: " + EXEC_REPORT % sessionId
-    print "See logs and detailed reports at: " + dataUrl
+    LOGGER.info("Test completed.")
+    LOGGER.info("See executive summary at: " + EXEC_REPORT % sessionId)
+    LOGGER.info("See logs and detailed reports at: " + dataUrl)
