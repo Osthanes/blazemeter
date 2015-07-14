@@ -87,6 +87,9 @@ def test_monitor(session_id):
 logging.captureWarnings(True)
 LOGGER = setup_logging()
 
+VCAP_APPLICATION = os.getenv("VCAP_APPLICATION")
+print VCAP_APPLICATION
+
 if not API_KEY:
     print LABEL_RED + STARS
     print "Error.  No Blazemeter API key specified."
