@@ -22,8 +22,6 @@ STARS = "**********************************************************************"
 API_KEY = os.getenv('BLAZEMETER_APIKEY')
 TEST_ID = os.getenv('TEST_ID')
 
-print "TEST_URL: " + os.getenv('TEST_URL')
-
 
 def request(url):
     headers = {'x-api-key': API_KEY}
@@ -83,14 +81,13 @@ def test_monitor(session_id):
         print e
         sys.exit(1)
 
-def create_test():
-
-
 
 # Start
 # Needed to get rid of InsecureRequestWarning
 logging.captureWarnings(True)
 LOGGER = setup_logging()
+
+print "TEST_URL: " + os.getenv('TEST_URL')
 
 if not API_KEY:
     print LABEL_RED + STARS
@@ -103,7 +100,6 @@ if not TEST_ID:
     print "Error. No test id specified."
     print STARS + LABEL_NO_COLOR
     sys.exit(1)
-
 
 LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
 
