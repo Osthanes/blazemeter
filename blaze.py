@@ -87,8 +87,6 @@ def test_monitor(session_id):
 logging.captureWarnings(True)
 LOGGER = setup_logging()
 
-print "TEST_URL: " + os.getenv('TEST_URL')
-
 if not API_KEY:
     print LABEL_RED + STARS
     print "Error.  No Blazemeter API key specified."
