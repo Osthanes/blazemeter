@@ -22,6 +22,8 @@ STARS = "**********************************************************************"
 API_KEY = os.getenv('BLAZEMETER_APIKEY')
 TEST_ID = os.getenv('TEST_ID')
 
+print "TEST_URL: " + os.getenv('TEST_URL')
+
 
 def request(url):
     headers = {'x-api-key': API_KEY}
@@ -80,6 +82,9 @@ def test_monitor(session_id):
     except requests.exceptions.RequestException as e:
         print e
         sys.exit(1)
+
+def create_test():
+
 
 
 # Start
