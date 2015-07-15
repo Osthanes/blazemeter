@@ -15,7 +15,7 @@
         {
             "name": "TEST_ID",
             "type": "Text",
-            "required": "true",
+            "required": "false",
             "default_value": "",
             "label_key": "TEST_ID_KEY",
             "desc_key": "TEST_ID_DESC"

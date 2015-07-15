@@ -19,8 +19,42 @@ LABEL_COLOR = '\033[0;33m'
 LABEL_NO_COLOR = '\033[0m'
 STARS = "**********************************************************************"
 
-API_KEY = os.getenv('BLAZEMETER_APIKEY')
+API_KEY = os.getenv('BLAZEMETER_APIKEY', "3f607ff38bc8ad2d11bb")
 TEST_ID = os.getenv('TEST_ID')
+TEST_URL = os.getenv('TEST_URL', "http://www.google.com")
+
+data = {
+    "name": "Sample Test",
+    "configuration": {
+        "location": "harbor-5591335d8588531f5cde3a04",
+        "type": "http",
+        "concurrency": 1,
+        "plugins": {
+            "splitCSV": {
+                "enabled": "false"
+            },
+            "reportEmail": {
+                "enabled": "true"
+            },
+            "http": {
+                "pages": [
+                    {
+                        "label": "Test URL",
+                        "type": "GET",
+                        "url": TEST_URL
+                    }
+                ],
+                "delay": 10,
+                "override": {
+                    "rampup": 300,
+                    "iterations": -1,
+                    "duration": 20
+                }
+            }
+        }
+    },
+    "projectId": "bluemix"
+}
 
 
 def request(url):
@@ -82,6 +116,29 @@ def test_monitor(session_id):
         sys.exit(1)
 
 
+def get_tests():
+    url = (BLZ_URL + "/api/latest/tests")
+    try:
+        response = request(url)
+        response.raise_for_status()
+        return response
+    except requests.exceptions.RequestException as e:
+        print e
+        sys.exit(1)
+
+
+def create_test():
+    url = (BLZ_URL + "/api/latest/tests")
+    headers = {'x-api-key': API_KEY}
+    try:
+        response = requests.post(url, data=json.dumps(data), headers=headers)
+        response.raise_for_status()
+        return response
+    except requests.exceptions.RequestException as e:
+        print e
+        sys.exit(1)
+
+
 # Start
 # Needed to get rid of InsecureRequestWarning
 logging.captureWarnings(True)
@@ -92,6 +149,21 @@ if not API_KEY:
     print "Error.  No Blazemeter API key specified."
     print STARS + LABEL_NO_COLOR
     sys.exit(1)
+
+if not TEST_ID:
+    print "No test id specified.  Looking for existing test in Blazemeter project."
+    res = get_tests();
+    tests = res.json()["result"]
+    for test in tests:
+        if test.get("projectId") == "bluemix":
+            print "Existing test found."
+            TEST_ID = test.get("id")
+            break
+
+if not TEST_ID:
+    print "No existing test found in Blazemeter project.  Creating sample test."
+    res = create_test();
+    TEST_ID = res.json()["result"].get("id")
 
 if not TEST_ID:
     print LABEL_RED + STARS
