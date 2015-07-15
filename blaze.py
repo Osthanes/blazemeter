@@ -191,8 +191,8 @@ if res.status_code == 200:
         open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
         LOGGER.info("Log files downloaded successfully.")
 
-    print LABEL_GREEN + LABEL_GREEN + STARS
+    print LABEL_GREEN + STARS + STARS
     print "Test completed successfully."
     print "See executive summary at: " + EXEC_REPORT % sessionId
     #print "See logs and detailed reports at: " + dataUrl
-    print LABEL_GREEN + LABEL_GREEN + STARS + LABEL_NO_COLOR
+    print LABEL_GREEN + STARS + STARS + LABEL_NO_COLOR
