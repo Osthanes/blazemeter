@@ -121,17 +121,17 @@ if not API_KEY:
     sys.exit(1)
 
 if not TEST_ID:
-    print "No test id specified.  Looking for existing test in Blazemeter project."
+    LOGGER.info("No test id specified.  Looking for existing test in Blazemeter project.")
     res = get_tests();
     tests = res.json()["result"]
     for test in tests:
-        if test.get("projectId") == "bluemix":
-            print "Existing test found."
+        if test.get("projectId") == "bluemix-devops":
+            LOGGER.info("Existing test found.")
             TEST_ID = test.get("id")
             break
 
 if not TEST_ID:
-    print "No existing test found in Blazemeter project.  Creating sample test."
+    LOGGER.info("No existing test found in Blazemeter project.  Creating sample test.")
     res = create_test();
     TEST_ID = res.json()["result"].get("id")
 
