@@ -23,39 +23,6 @@ API_KEY = os.getenv('BLAZEMETER_APIKEY', "3f607ff38bc8ad2d11bb")
 TEST_ID = os.getenv('TEST_ID')
 TEST_URL = os.getenv('TEST_URL', "http://www.google.com")
 
-data = {
-    "name": "Sample Test",
-    "configuration": {
-        "location": "harbor-5591335d8588531f5cde3a04",
-        "type": "http",
-        "concurrency": 1,
-        "plugins": {
-            "splitCSV": {
-                "enabled": "false"
-            },
-            "reportEmail": {
-                "enabled": "true"
-            },
-            "http": {
-                "pages": [
-                    {
-                        "label": "Test URL",
-                        "type": "GET",
-                        "url": TEST_URL
-                    }
-                ],
-                "delay": 10,
-                "override": {
-                    "rampup": 300,
-                    "iterations": -1,
-                    "duration": 20
-                }
-            }
-        }
-    },
-    "projectId": "bluemix"
-}
-
 
 def request(url):
     headers = {'x-api-key': API_KEY}
@@ -131,6 +98,9 @@ def create_test():
     url = (BLZ_URL + "/api/latest/tests")
     headers = {'x-api-key': API_KEY}
     try:
+        with open('blazemeter-test.json') as data_file:
+            data = json.load(data_file)
+            data["configuration"].get("plugins").get("http").get("pages")[0]["url"] = TEST_URL
         response = requests.post(url, data=json.dumps(data), headers=headers)
         response.raise_for_status()
         return response
