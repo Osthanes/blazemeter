@@ -19,7 +19,7 @@
             "default_value": "",
             "label_key": "TEST_ID_KEY",
             "desc_key": "TEST_ID_DESC"
-        },   
+        },
         {
             "name": "SETUP_SERVICE_SPACE",
             "type": "Checkbox",
@@ -39,16 +39,22 @@
         "type": "JenkinsDocker",
         "shell": "#!/bin/bash
 set +x
-set +e 
+set +e
 export INIT_START_TIME=$(date +\"%s\")
 
 export TEST_ID=#TEST_ID#
 export SETUP_SERVICE_SPACE=#SETUP_SERVICE_SPACE#
 
+
+echo $SETUP_SERVICE_SPACE
+echo ${CF_APP}
+echo $CF_APP
+
 . $EXT_DIR/_init.sh
 INIT_END_TIME=$(date +\"%s\")
 INIT_EST_TIME=$(($INIT_END_TIME-$INIT_START_TIME))
 echo -e \"Init runtime of `date -u -d @\"$INIT_EST_TIME\" +\'%-Mm %-Ss\'`\"
+
 
 ${EXT_DIR}/blaze.py
 RESULT=$?
