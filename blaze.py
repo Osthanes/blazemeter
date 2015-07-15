@@ -6,6 +6,7 @@ import json
 import time
 import logging
 import os
+import urllib2
 
 BLZ_URL = "https://a.blazemeter.com"
 POLL_TIME = 30
@@ -22,6 +23,7 @@ STARS = "**********************************************************************"
 API_KEY = os.getenv('BLAZEMETER_APIKEY', "3f607ff38bc8ad2d11bb")
 TEST_ID = os.getenv('TEST_ID')
 TEST_URL = os.getenv('TEST_URL', "http://www.google.com")
+APP_NAME = os.getenv('APP_NAME')
 
 
 def request(url):
@@ -109,10 +111,22 @@ def create_test():
         sys.exit(1)
 
 
+def get_logs(session_id):
+    url = (BLZ_URL + "/api/latest/sessions/{0}/reports/logs/").format(session_id)
+    try:
+        response = request(url)
+        response.raise_for_status()
+        return response
+    except requests.exceptions.RequestException as e:
+        print e
+        sys.exit(1)
+
+
 # Start
 # Needed to get rid of InsecureRequestWarning
 logging.captureWarnings(True)
 LOGGER = setup_logging()
+print APP_NAME
 
 if not API_KEY:
     print LABEL_RED + STARS
@@ -141,6 +155,7 @@ if not TEST_ID:
     print STARS + LABEL_NO_COLOR
     sys.exit(1)
 
+
 LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
 
 res = test_start(TEST_ID)
@@ -164,10 +179,20 @@ if res.status_code == 200:
                 break
             time.sleep(POLL_TIME)
 
-    dataUrl = res_json["result"].get("dataUrl")
+    LOG_ZIP = "jtls_and_more.zip"
+    res = get_logs(sessionId)
+    res_json = res.json()
+    for data in res_json["result"].get("data"):
+        if data['filename'] == LOG_ZIP:
+            dataUrl = data["dataUrl"]
+            break
 
-    print LABEL_GREEN + STARS
+    if dataUrl:
+        print dataUrl
+        open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
+
+    print LABEL_GREEN + LABEL_GREEN + STARS
     print "Test completed successfully."
     print "See executive summary at: " + EXEC_REPORT % sessionId
-    print "See logs and detailed reports at: " + dataUrl
-    print LABEL_GREEN + STARS + LABEL_NO_COLOR
+    #print "See logs and detailed reports at: " + dataUrl
+    print LABEL_GREEN + LABEL_GREEN + STARS + LABEL_NO_COLOR
