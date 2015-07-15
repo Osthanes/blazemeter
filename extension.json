@@ -55,6 +55,9 @@ echo -e \"Init runtime of `date -u -d @\"$INIT_EST_TIME\" +\'%-Mm %-Ss\'`\"
 ${EXT_DIR}/blaze.py
 RESULT=$?
 
+echo ArchiveDir: $ARCHIVE_DIR
+find . -name jtls_and_more.zip
+
 
 if [ $RESULT -ne 0 ]; then
     exit 1

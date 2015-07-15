@@ -188,8 +188,8 @@ if res.status_code == 200:
             break
 
     if dataUrl:
-        print dataUrl
         open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
+        LOGGER.log("Log files downloaded successfully.")
 
     print LABEL_GREEN + LABEL_GREEN + STARS
     print "Test completed successfully."
