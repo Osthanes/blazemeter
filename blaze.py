@@ -24,6 +24,7 @@ API_KEY = os.getenv('BLAZEMETER_APIKEY', "3f607ff38bc8ad2d11bb")
 TEST_ID = os.getenv('TEST_ID')
 TEST_URL = os.getenv('TEST_URL', "http://www.google.com")
 APP_NAME = os.getenv('APP_NAME')
+EXT_DIR = os.getenv('EXT_DIR', ".")
 
 
 def request(url):
@@ -100,7 +101,7 @@ def create_test():
     url = (BLZ_URL + "/api/latest/tests")
     headers = {'x-api-key': API_KEY}
     try:
-        with open('blazemeter-test.json') as data_file:
+        with open(EXT_DIR + '/blazemeter-test.json') as data_file:
             data = json.load(data_file)
             data["configuration"].get("plugins").get("http").get("pages")[0]["url"] = TEST_URL
         response = requests.post(url, data=json.dumps(data), headers=headers)
