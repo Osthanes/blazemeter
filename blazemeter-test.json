@@ -3,7 +3,7 @@
   "configuration": {
     "location": "harbor-5591335d8588531f5cde3a04",
     "type": "http",
-    "concurrency": 50,
+    "concurrency": 10,
     "plugins": {
       "splitCSV": {
         "enabled": "false"
@@ -18,7 +18,7 @@
         "delay": 10,
         "override": {
           "rampup": 300,
-          "duration": 20
+          "duration": 1
         }
       }
     }
