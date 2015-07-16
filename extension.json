@@ -54,7 +54,6 @@ echo -e \"Init runtime of `date -u -d @\"$INIT_EST_TIME\" +\'%-Mm %-Ss\'`\"
 APP_URL=$(cf app $APP_NAME | grep 'urls:' | awk '{print $2}' | cut -d '*' -f 2)
 export APP_URL
 
-pip install PrettyTable
 ${EXT_DIR}/blaze.py
 RESULT=$?
 
