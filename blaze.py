@@ -127,7 +127,6 @@ def get_logs(session_id):
 # Needed to get rid of InsecureRequestWarning
 logging.captureWarnings(True)
 LOGGER = setup_logging()
-print APP_NAME
 
 if not API_KEY:
     print LABEL_RED + STARS
