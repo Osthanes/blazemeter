@@ -7,6 +7,7 @@ import time
 import logging
 import os
 import urllib2
+from prettytable import PrettyTable
 
 BLZ_URL = "https://a.blazemeter.com"
 POLL_TIME = 30
@@ -102,8 +103,8 @@ def create_test():
     headers = {'x-api-key': API_KEY}
     try:
         with open(EXT_DIR + '/blazemeter-test.json') as data_file:
-            data = json.load(data_file)
-            data["configuration"].get("plugins").get("http").get("pages")[0]["url"] = APP_URL
+            test_data = json.load(data_file)
+            test_data["configuration"].get("plugins").get("http").get("pages")[0]["url"] = "http://%s" % APP_URL
         response = requests.post(url, data=json.dumps(data), headers=headers)
         response.raise_for_status()
         return response
@@ -121,6 +122,40 @@ def get_logs(session_id):
     except requests.exceptions.RequestException as e:
         print e
         sys.exit(1)
+
+
+def get_summary(session_id):
+    url = (BLZ_URL + "/api/latest/sessions/{0}/reports/main/summary").format(session_id)
+    try:
+        response = request(url)
+        response.raise_for_status()
+        return response
+    except requests.exceptions.RequestException as e:
+        print e
+        sys.exit(1)
+
+
+def create_summary_table(session_id):
+    response = get_summary(session_id)
+    response_json = response.json()
+    fields = response_json["result"].get("availableFields")
+
+    labels = ["Label", "# Samples", "Avg. Latency", "Avg. Response Time", "Bytes Geo Mean", "Geo. Mean Response Time",
+              "StDev", "90% Line", "95% Line", "99% Line", "Min", "Max", "Avg. Bandwidth (Bytes/s)",
+              "Avg. Throughput (Hits/s)", "Error %", "Duration (hh:mm:ss)"]
+
+    table = PrettyTable(labels)
+    table.align["id"] = "l"
+
+    for summary_data in response_json["result"].get("summary"):
+        row_data = []
+        for field in fields:
+            if field == "id":
+                field = "lbl"
+            row_data.append(str(summary_data.get(field)))
+        table.add_row(row_data)
+
+    return table
 
 
 # Start
@@ -154,7 +189,6 @@ if not TEST_ID:
     print "Error. No test id specified."
     print STARS + LABEL_NO_COLOR
     sys.exit(1)
-
 
 LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
 
@@ -191,8 +225,8 @@ if res.status_code == 200:
         open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
         LOGGER.info("Log files downloaded successfully.")
 
+    print create_summary_table(sessionId)
     print LABEL_GREEN + STARS + STARS
     print "Test completed successfully."
     print "See executive summary at: " + EXEC_REPORT % sessionId
-    #print "See logs and detailed reports at: " + dataUrl
     print LABEL_GREEN + STARS + STARS + LABEL_NO_COLOR
