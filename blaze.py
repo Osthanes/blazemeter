@@ -20,9 +20,9 @@ LABEL_COLOR = '\033[0;33m'
 LABEL_NO_COLOR = '\033[0m'
 STARS = "**********************************************************************"
 
-API_KEY = os.getenv('BLAZEMETER_APIKEY', "3f607ff38bc8ad2d11bb")
+API_KEY = os.getenv('BLAZEMETER_APIKEY')
 TEST_ID = os.getenv('TEST_ID')
-TEST_URL = os.getenv('TEST_URL', "http://www.google.com")
+APP_URL = os.getenv('APP_URL')
 APP_NAME = os.getenv('APP_NAME')
 EXT_DIR = os.getenv('EXT_DIR', ".")
 
@@ -103,7 +103,7 @@ def create_test():
     try:
         with open(EXT_DIR + '/blazemeter-test.json') as data_file:
             data = json.load(data_file)
-            data["configuration"].get("plugins").get("http").get("pages")[0]["url"] = TEST_URL
+            data["configuration"].get("plugins").get("http").get("pages")[0]["url"] = APP_URL
         response = requests.post(url, data=json.dumps(data), headers=headers)
         response.raise_for_status()
         return response
