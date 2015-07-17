@@ -140,22 +140,34 @@ def create_summary_table(session_id):
     response_json = response.json()
     fields = response_json["result"].get("availableFields")
 
-    labels = ["Label", "# Samples", "Avg. Latency", "Avg. Response Time", "Bytes Geo Mean", "Geo. Mean Response Time",
-              "StDev", "90% Line", "95% Line", "99% Line", "Min", "Max", "Avg. Bandwidth (Bytes/s)",
-              "Avg. Throughput (Hits/s)", "Error %", "Duration (hh:mm:ss)"]
+    labels = ["Label", "# Samples", "Avg. Latency", "Avg. Response Time", "Geo. Mean Response Time",
+              "StDev", "90% Line", "95% Line", "99% Line", "Min", "Max", "Avg. Bandwidth",
+              "Avg. Throughput", "Error %", "Duration"]
 
     table = PrettyTable(labels)
-    table.align["id"] = "l"
+    table.align["Label"] = "l"
 
     for summary_data in response_json["result"].get("summary"):
         row_data = []
         for field in fields:
             if field == "id":
-                field = "lbl"
-            row_data.append(str(summary_data.get(field)))
+                field = "lb"
+            if field != "bytesGeoMean":
+                row_data.append(str(summary_data.get(field)))
         table.add_row(row_data)
 
     return table
+
+
+def print_summary(session_id):
+    print
+    print LABEL_GREEN + STARS + STARS
+    print "Test completed successfully."
+    print
+    print create_summary_table(sessionId)
+    print
+    print "See executive summary at: " + EXEC_REPORT % sessionId
+    print LABEL_GREEN + STARS + STARS + LABEL_NO_COLOR
 
 
 # Start
@@ -203,11 +215,9 @@ if res.status_code == 200:
         while True:
             res = test_monitor(sessionId)
             res_json = res.json()
-            # print_json(res_json)
             newStatus = res_json["result"].get("status")
             if newStatus != status:
                 status = newStatus
-                # statusCode = res_json["result"].get("statusCode")
                 LOGGER.info(status)
             if status == "ENDED":
                 break
@@ -225,8 +235,4 @@ if res.status_code == 200:
         open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
         LOGGER.info("Log files downloaded successfully.")
 
-    print create_summary_table(sessionId)
-    print LABEL_GREEN + STARS + STARS
-    print "Test completed successfully."
-    print "See executive summary at: " + EXEC_REPORT % sessionId
-    print LABEL_GREEN + STARS + STARS + LABEL_NO_COLOR
+    print_summary(sessionId)
