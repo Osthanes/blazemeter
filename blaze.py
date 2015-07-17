@@ -7,7 +7,7 @@ import time
 import logging
 import os
 import urllib2
-#from prettytable import PrettyTable
+from prettytable import PrettyTable
 
 BLZ_URL = "https://a.blazemeter.com"
 POLL_TIME = 30
@@ -225,7 +225,7 @@ if res.status_code == 200:
         open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
         LOGGER.info("Log files downloaded successfully.")
 
-    #print create_summary_table(sessionId)
+    print create_summary_table(sessionId)
     print LABEL_GREEN + STARS + STARS
     print "Test completed successfully."
     print "See executive summary at: " + EXEC_REPORT % sessionId
