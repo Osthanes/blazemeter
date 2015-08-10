@@ -14,7 +14,7 @@
     "params": [
         {
             "name": "BLAZEMETER_APIKEY",
-            "type": "Text",
+            "type": "Secure",
             "required": "true",
             "default_value": "",
             "label_key": "BLAZEMETER_APIKEY_KEY",
