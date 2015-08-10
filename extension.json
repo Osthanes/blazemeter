@@ -13,6 +13,14 @@
     ],
     "params": [
         {
+            "name": "BLAZEMETER_APIKEY",
+            "type": "Text",
+            "required": "true",
+            "default_value": "",
+            "label_key": "BLAZEMETER_APIKEY_KEY",
+            "desc_key": "BLAZEMETER_APIKEY_DESC"
+        },
+        {
             "name": "TEST_ID",
             "type": "Text",
             "required": "false",
@@ -49,6 +57,7 @@ export INIT_START_TIME=$(date +\"%s\")
 export TEST_ID=#TEST_ID#
 export SETUP_SERVICE_SPACE=#SETUP_SERVICE_SPACE#
 export APP_NAME
+export BLAZEMETER_APIKEY=#BLAZEMETER_APIKEY#
 
 . $EXT_DIR/_init.sh
 INIT_END_TIME=$(date +\"%s\")
