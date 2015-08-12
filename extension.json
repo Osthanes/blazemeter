@@ -79,9 +79,7 @@ mv jtls_and_more.zip $ARCHIVE_DIR
 if [ $RESULT -ne 0 ]; then
     exit 1
 fi
-
 "
-    }
     },
     "project": "https://hub.jazz.net/project/alchemy/Alchemy-Ostanes",
     "project_example": "https://hub.jazz.net/pipeline/rjminsha/ice-pipeline_demo",
