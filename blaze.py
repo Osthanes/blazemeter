@@ -105,7 +105,7 @@ def create_test():
         with open(EXT_DIR + '/blazemeter-test.json') as data_file:
             test_data = json.load(data_file)
             test_data["configuration"].get("plugins").get("http").get("pages")[0]["url"] = "http://%s" % APP_URL
-        response = requests.post(url, data=json.dumps(data), headers=headers)
+        response = requests.post(url, data=json.dumps(test_data), headers=headers)
         response.raise_for_status()
         return response
     except requests.exceptions.RequestException as e:
