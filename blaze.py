@@ -101,6 +101,7 @@ def get_tests():
 def create_test():
     url = (BLZ_URL + "/api/latest/tests")
     headers = {'x-api-key': API_KEY}
+    print APP_URL
     try:
         with open(EXT_DIR + '/blazemeter-test.json') as data_file:
             test_data = json.load(data_file)
