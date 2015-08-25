@@ -125,39 +125,39 @@ def get_logs(session_id):
         sys.exit(1)
 
 
-def get_summary(session_id):
-    url = (BLZ_URL + "/api/latest/sessions/{0}/reports/main/summary").format(session_id)
-    try:
-        response = request(url)
-        response.raise_for_status()
-        return response
-    except requests.exceptions.RequestException as e:
-        print e
-        sys.exit(1)
-
-
-def create_summary_table(session_id):
-    response = get_summary(session_id)
-    response_json = response.json()
-    fields = response_json["result"].get("availableFields")
-
-    labels = ["Label", "# Samples", "Avg. Latency", "Avg. Response Time", "Geo. Mean Response Time",
-              "StDev", "90% Line", "95% Line", "99% Line", "Min", "Max", "Avg. Bandwidth",
-              "Avg. Throughput", "Error %", "Duration"]
-
-    table = PrettyTable(labels)
-    table.align["Label"] = "l"
-
-    for summary_data in response_json["result"].get("summary"):
-        row_data = []
-        for field in fields:
-            if field == "id":
-                field = "lb"
-            if field != "bytesGeoMean":
-                row_data.append(str(summary_data.get(field)))
-        table.add_row(row_data)
-
-    return table
+#def get_summary(session_id):
+#    url = (BLZ_URL + "/api/latest/sessions/{0}/reports/main/summary").format(session_id)
+#    try:
+#        response = request(url)
+#        response.raise_for_status()
+#        return response
+#    except requests.exceptions.RequestException as e:
+#        print e
+#        sys.exit(1)
+#
+#
+#def create_summary_table(session_id):
+#    response = get_summary(session_id)
+#    response_json = response.json()
+#    fields = response_json["result"].get("availableFields")
+#
+#    labels = ["Label", "# Samples", "Avg. Latency", "Avg. Response Time", "Geo. Mean Response Time",
+#              "StDev", "90% Line", "95% Line", "99% Line", "Min", "Max", "Avg. Bandwidth",
+#              "Avg. Throughput", "Error %", "Duration"]
+#
+#    table = PrettyTable(labels)
+#    table.align["Label"] = "l"
+#
+#    for summary_data in response_json["result"].get("summary"):
+#        row_data = []
+#        for field in fields:
+#            if field == "id":
+#                field = "lb"
+#            if field != "bytesGeoMean":
+#                row_data.append(str(summary_data.get(field)))
+#        table.add_row(row_data)
+#
+#    return table
 
 
 def print_summary(session_id):
@@ -165,7 +165,7 @@ def print_summary(session_id):
     print LABEL_GREEN + STARS + STARS
     print "Test completed successfully."
     print
-    print create_summary_table(sessionId)
+#    print create_summary_table(sessionId)
     print
     print "See executive summary at: " + EXEC_REPORT % sessionId
     print LABEL_GREEN + STARS + STARS + LABEL_NO_COLOR
