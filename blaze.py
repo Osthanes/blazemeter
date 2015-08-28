@@ -178,8 +178,8 @@ def download_logs(session_id):
             break
             
     if dataUrl:
-            open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
-            LOGGER.info("Log files downloaded successfully.")
+        open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
+        LOGGER.info("Log files downloaded successfully.")
 
     print_summary(session_id)
     
@@ -206,20 +206,20 @@ if not API_KEY:
     print STARS + LABEL_NO_COLOR
     sys.exit(1)
 
-#if not TEST_ID:
-#    LOGGER.info("No test id specified.  Looking for existing test in Blazemeter project.")
-#    res = get_tests();
-#    tests = res.json()["result"]
-#    for test in tests:
-#        if test.get("projectId") == "bluemix-devops":
-#            LOGGER.info("Existing test found.")
-#            TEST_ID = test.get("id")
-#            break
-#
-#if not TEST_ID:
-#    LOGGER.info("No existing test found in Blazemeter project.  Creating sample test.")
-#    res = create_test();
-#    TEST_ID = res.json()["result"].get("id")
+if not TEST_ID:
+    LOGGER.info("No test id specified.  Looking for existing test in Blazemeter project.")
+    res = get_tests();
+    tests = res.json()["result"]
+    for test in tests:
+        if test.get("projectId") == "bluemix-devops":
+            LOGGER.info("Existing test found.")
+            TEST_ID = test.get("id")
+            break
+
+if not TEST_ID:
+    LOGGER.info("No existing test found in Blazemeter project.  Creating sample test.")
+    res = create_test();
+    TEST_ID = res.json()["result"].get("id")
 
 if not TEST_ID:
     print LABEL_RED + STARS
@@ -254,3 +254,5 @@ if len(TEST_ID) == 5:
 else if len(TEST_ID) == 6:
     #run a multitest
     LOGGER.info("Starting multi-test.  [Collection Id: %s]" % TEST_ID)
+    
+    res = collection_start(TEST_ID)
