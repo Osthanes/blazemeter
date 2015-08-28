@@ -73,7 +73,16 @@ def test_start(test_id):
     except requests.exceptions.RequestException as e:
         print e
         sys.exit(1)
-
+        
+def collection_start(collection_id):
+    url = (BLZ_URL + "/api/latest/collections/{0}/start").format(collection_id)
+    try:
+        response = request(url)
+        response.raise_for_status()
+        return response
+    except requests.exceptions.RequestException as e:
+        print e
+        sys.exit(1)
 
 def test_monitor(session_id):
     url = (BLZ_URL + "/api/latest/sessions/{0}").format(session_id)
@@ -159,15 +168,30 @@ def get_logs(session_id):
 #
 #    return table
 
+def download_logs(session_id):
+    LOG_ZIP = "jtls_and_more.zip"
+    res = get_logs(session_id)
+    res_json = res.json()
+    for data in res_json["result"].get("data"):
+        if data['filename'] == LOG_ZIP:
+            dataUrl = data["dataUrl"]
+            break
+            
+    if dataUrl:
+            open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
+            LOGGER.info("Log files downloaded successfully.")
 
+    print_summary(session_id)
+    
+    
 def print_summary(session_id):
     print
     print LABEL_GREEN + STARS + STARS
     print "Test completed successfully."
     print
 #    print create_summary_table(sessionId)
-    print
     print "See executive summary at: " + EXEC_REPORT % sessionId
+    print
     print LABEL_GREEN + STARS + STARS + LABEL_NO_COLOR
 
 
@@ -182,20 +206,20 @@ if not API_KEY:
     print STARS + LABEL_NO_COLOR
     sys.exit(1)
 
-if not TEST_ID:
-    LOGGER.info("No test id specified.  Looking for existing test in Blazemeter project.")
-    res = get_tests();
-    tests = res.json()["result"]
-    for test in tests:
-        if test.get("projectId") == "bluemix-devops":
-            LOGGER.info("Existing test found.")
-            TEST_ID = test.get("id")
-            break
-
-if not TEST_ID:
-    LOGGER.info("No existing test found in Blazemeter project.  Creating sample test.")
-    res = create_test();
-    TEST_ID = res.json()["result"].get("id")
+#if not TEST_ID:
+#    LOGGER.info("No test id specified.  Looking for existing test in Blazemeter project.")
+#    res = get_tests();
+#    tests = res.json()["result"]
+#    for test in tests:
+#        if test.get("projectId") == "bluemix-devops":
+#            LOGGER.info("Existing test found.")
+#            TEST_ID = test.get("id")
+#            break
+#
+#if not TEST_ID:
+#    LOGGER.info("No existing test found in Blazemeter project.  Creating sample test.")
+#    res = create_test();
+#    TEST_ID = res.json()["result"].get("id")
 
 if not TEST_ID:
     print LABEL_RED + STARS
@@ -203,37 +227,30 @@ if not TEST_ID:
     print STARS + LABEL_NO_COLOR
     sys.exit(1)
 
-LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
+if len(TEST_ID) == 5:
+    LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
 
-res = test_start(TEST_ID)
+    res = test_start(TEST_ID)
 
-if res.status_code == 200:
-    sessionId = res.json()["result"].get("sessionsId")[0]
-    if sessionId:
-        LOGGER.info("Test started successfully.  [Session Id: %s]" % sessionId)
+    if res.status_code == 200:
+        sessionId = res.json()["result"].get("sessionsId")[0]
+        if sessionId:
+            LOGGER.info("Test started successfully.  [Session Id: %s]" % sessionId)
 
-        status = None
-        while True:
-            res = test_monitor(sessionId)
-            res_json = res.json()
-            newStatus = res_json["result"].get("status")
-            if newStatus != status:
-                status = newStatus
-                LOGGER.info(status)
-            if status == "ENDED":
-                break
-            time.sleep(POLL_TIME)
+            status = None
+            while True:
+                res = test_monitor(sessionId)
+                res_json = res.json()
+                newStatus = res_json["result"].get("status")
+                if newStatus != status:
+                    status = newStatus
+                    LOGGER.info(status)
+                if status == "ENDED":
+                    break
+                time.sleep(POLL_TIME)
+                
+    download_logs(sessionId)
 
-    LOG_ZIP = "jtls_and_more.zip"
-    res = get_logs(sessionId)
-    res_json = res.json()
-    for data in res_json["result"].get("data"):
-        if data['filename'] == LOG_ZIP:
-            dataUrl = data["dataUrl"]
-            break
-
-    if dataUrl:
-        open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
-        LOGGER.info("Log files downloaded successfully.")
-
-    print_summary(sessionId)
+else if len(TEST_ID) == 6:
+    #run a multitest
+    LOGGER.info("Starting multi-test.  [Collection Id: %s]" % TEST_ID)
