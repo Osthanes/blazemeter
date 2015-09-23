@@ -7,7 +7,7 @@ import time
 import logging
 import os
 import urllib2
-from prettytable import PrettyTable
+#from prettytable import PrettyTable
 
 BLZ_URL = "https://a.blazemeter.com"
 POLL_TIME = 30

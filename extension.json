@@ -41,10 +41,6 @@
         {
             "type": "Artifacts",
             "inclusion" : "always"
-        },
-        {
-            "type": "Tests",
-            "inclusion": "optional"
         }
     ],
     "execution": {
@@ -76,9 +72,9 @@ else
     export APP_URL
 fi
         
-sudo apt-get install -y python-setuptools
-export PYTHONPATH=$PYTHONPATH:/tmp
-easy_install --install-dir=/tmp prettytable
+#sudo apt-get install -y python-setuptools
+#export PYTHONPATH=$PYTHONPATH:/tmp
+#easy_install --install-dir=/tmp prettytable
 
 ${EXT_DIR}/blaze.py
 RESULT=$?
