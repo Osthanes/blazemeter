@@ -1,0 +1,28 @@
+{
+  "name": "Sample Devops Load Test",
+  "configuration": {
+    "location": "harbor-5591335d8588531f5cde3a04",
+    "type": "http",
+    "concurrency": 20,
+    "plugins": {
+      "splitCSV": {
+        "enabled": "false"
+      },
+      "http": {
+        "pages": [
+          {
+            "label": "Bluemix Application URL",
+            "type": "GET"
+          }
+        ],
+        "delay": 10,
+        "override": {
+          "rampup": 150,
+          "iterations": 10,
+          "duration": 10
+        }
+      }
+    }
+  },
+  "projectId": "bluemix-devops"
+}
