@@ -251,7 +251,7 @@ if len(TEST_ID) == 5:
                 
     download_logs(sessionId)
 
-else if len(TEST_ID) == 6:
+elif len(TEST_ID) == 6:
     #run a multitest
     LOGGER.info("Starting multi-test.  [Collection Id: %s]" % TEST_ID)
     
