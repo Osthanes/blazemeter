@@ -21,6 +21,7 @@ LABEL_COLOR = '\033[0;33m'
 LABEL_NO_COLOR = '\033[0m'
 STARS = "**********************************************************************"
 
+API_URL = os.getenv('API_URL')
 API_KEY = os.getenv('BLAZEMETER_APIKEY')
 TEST_ID = os.getenv('TEST_ID')
 APP_URL = os.getenv('APP_URL')
@@ -65,17 +66,7 @@ def setup_logging():
 
 
 def test_start(test_id):
-    url = (BLZ_URL + "/api/latest/tests/{0}/start").format(test_id)
-    try:
-        response = request(url)
-        response.raise_for_status()
-        return response
-    except requests.exceptions.RequestException as e:
-        print e
-        sys.exit(1)
-        
-def collection_start(collection_id):
-    url = (BLZ_URL + "/api/latest/collections/{0}/start").format(collection_id)
+    url = (API_URL + "/start")
     try:
         response = request(url)
         response.raise_for_status()
@@ -169,6 +160,7 @@ def get_logs(session_id):
 #    return table
 
 def download_logs(session_id):
+    LOGGER.info("Checking for log files.")
     LOG_ZIP = "jtls_and_more.zip"
     res = get_logs(session_id)
     res_json = res.json()
@@ -176,14 +168,14 @@ def download_logs(session_id):
         if data['filename'] == LOG_ZIP:
             dataUrl = data["dataUrl"]
             break
-            
+
     if dataUrl:
         open(LOG_ZIP, 'wb').write(urllib2.urlopen(dataUrl).read())
         LOGGER.info("Log files downloaded successfully.")
 
     print_summary(session_id)
-    
-    
+
+
 def print_summary(session_id):
     print
     print LABEL_GREEN + STARS + STARS
@@ -227,32 +219,38 @@ if not TEST_ID:
     print STARS + LABEL_NO_COLOR
     sys.exit(1)
 
-if len(TEST_ID) == 5:
-    LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
+if not API_URL:
+    API_URL = (BLZ_URL + "/api/latest/tests/{0}").format(TEST_ID)
+    if request(API_URL).status_code != requests.codes.ok:
+        API_URL = (BLZ_URL + "/api/latest/collections/{0}").format(TEST_ID)
+        if request(API_URL).status_code != requests.codes.ok:
+            print "Error. No test or collection with id {0}.".format(TEST_ID)
+            sys.exit(1)
 
-    res = test_start(TEST_ID)
+LOGGER.info("Starting test.  [Test Id: %s]" % TEST_ID)
 
-    if res.status_code == 200:
-        sessionId = res.json()["result"].get("sessionsId")[0]
-        if sessionId:
-            LOGGER.info("Test started successfully.  [Session Id: %s]" % sessionId)
+res = test_start(TEST_ID)
 
-            status = None
-            while True:
-                res = test_monitor(sessionId)
-                res_json = res.json()
-                newStatus = res_json["result"].get("status")
-                if newStatus != status:
-                    status = newStatus
-                    LOGGER.info(status)
-                if status == "ENDED":
-                    break
-                time.sleep(POLL_TIME)
-                
-    download_logs(sessionId)
+if res.status_code == 200:
+    sessionId = res.json()["result"].get("sessionsId")[0]
+    if sessionId:
+        LOGGER.info("Test started successfully.  [Session Id: %s]" % sessionId)
 
-elif len(TEST_ID) == 6:
-    #run a multitest
-    LOGGER.info("Starting multi-test.  [Collection Id: %s]" % TEST_ID)
-    
-    res = collection_start(TEST_ID)
+        timeSinceLastOutput = 0
+        status = None
+        while True:
+            res = test_monitor(sessionId)
+            res_json = res.json()
+            newStatus = res_json["result"].get("status")
+            if newStatus != status:
+                status = newStatus
+                LOGGER.info(status)
+            if status == "ENDED":
+                break
+            now = time.time()
+            if now - timeSinceLastOutput > 300:
+                LOGGER.info("Polling for test completion...")
+                timeSinceLastOutput = now
+            time.sleep(POLL_TIME)
+
+download_logs(sessionId)
